@@ -32,7 +32,7 @@ class Window < Gosu::Window
     while x < width
     	y = 0
     	while y < height
-    		@particles << Particle.new(self, x, y)
+    		@particles << Particle.new(self, x, y, (height * 0.5).round)
     		y += ySpace
     	end
     	x += xSpace
@@ -58,7 +58,7 @@ class Window < Gosu::Window
   end
 
   def button_down(id)
-  	if id != Gosu::MsLeft
+  	if id != Gosu::MsLeft && id != Gosu::MsRight
   		makeParticles
   	end
   	if id == Gosu::KbEscape
@@ -68,11 +68,12 @@ class Window < Gosu::Window
 end
 
 class Particle
-	def initialize(window, x, y)
+	def initialize(window, x, y, radius = 500)
 		@window = window
 		@x = x
 		@y = y
 		@velX = @velY = 0.0
+		@radius = radius
 		@color = $colors[Random.rand(1...$colors.length)]
 	end
 
@@ -98,10 +99,18 @@ class Particle
 		difX = findLeastDiff(:x)
 		difY = findLeastDiff(:y)
 		distance = dist(difX, difY)
-		amt = 500
-		newD = amt - distance.abs
-		bool = newD > 0 && @window.button_down?(Gosu::MsLeft)
-		multFactor = newD / (amt / 0.01)
+		newD = @radius - distance.abs
+		bool = newD > 0
+		left = @window.button_down?(Gosu::MsLeft)
+		right = @window.button_down?(Gosu::MsRight)
+		multFactor = newD / (@radius / 0.01)
+		if left
+			multFactor *= -1
+		elsif right
+			multFactor *= 1
+		else
+			multFactor *= 0
+		end
 		@velX += difX * multFactor if bool
 		@velY += difY * multFactor if bool
 		friction = 0.98
