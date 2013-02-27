@@ -127,11 +127,11 @@ class Particle
 	end
 
 	def draw
-		size = 5
+		size = 4
 		@window.draw_quad(@x, @y, @color, @x + size, @y, @color, @x + size, @y + size, @color, @x, @y + size, @color, Layers::Pixels)
 	end
 end
 
-num = 30
+num = 25
 window = Window.new(num, num)
 window.show
