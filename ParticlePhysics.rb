@@ -70,6 +70,8 @@ end
 class Particle
 	def initialize(window, x, y, radius = 500)
 		@window = window
+		@origX = x
+		@origY = y
 		@x = x
 		@y = y
 		@velX = @velY = 0.0
@@ -81,13 +83,7 @@ class Particle
 		Math.sqrt(difX ** 2 + difY ** 2)
 	end
 
-	def findLeastDiff(a)
-		m = @window.mouse_x if a == :x
-		m = @window.mouse_y if a == :y
-		c = @x if a == :x
-		c = @y if a == :y
-		screen = @window.width if a == :x
-		screen = @window.height if a == :y
+	def findLeastDiff(m, c, screen)
 		num = (screen - 2) / 2
 		r = c - m
 		r += screen if r < num
@@ -96,8 +92,8 @@ class Particle
 	end
 
 	def velUpdate
-		difX = findLeastDiff(:x)
-		difY = findLeastDiff(:y)
+		difX = findLeastDiff(@window.mouse_x, @x, @window.width)
+		difY = findLeastDiff(@window.mouse_y, @y, @window.height)
 		distance = dist(difX, difY)
 		newD = @radius - distance.abs
 		bool = newD > 0
@@ -111,8 +107,16 @@ class Particle
 		else
 			multFactor *= 0
 		end
-		@velX += difX * multFactor if bool
-		@velY += difY * multFactor if bool
+		if bool && multFactor != 0
+			@velX += difX * multFactor 
+			@velY += difY * multFactor
+		else
+			origDifX = findLeastDiff(@origX, @x, @window.width)
+			origDifY = findLeastDiff(@origY, @y, @window.height)
+			multFactor = -0.0005
+			@velX += origDifX * multFactor
+			@velY += origDifY * multFactor
+		end
 		friction = 0.98
 		@velX *= friction
 		@velY *= friction
