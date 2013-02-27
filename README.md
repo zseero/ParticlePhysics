@@ -8,4 +8,5 @@ Requirements:
 - gosu
 
 Gosu installation:
+
 $ gem install gosu
